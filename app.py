@@ -1,23 +1,15 @@
-from flask import Flask, render_template, request
 import joblib
-import numpy as np
+import requests
+import io
 
-app = Flask(__name__)
-model = joblib.load("ids_model.pkl")
+def download_model_from_gdrive(share_url):
+    file_id = share_url.split('/d/')[1].split('/')[0]
+    download_url = f"https://drive.google.com/uc?export=download&id={file_id}"
+    response = requests.get(download_url)
+    if response.status_code != 200:
+        raise Exception("Failed to download model from Google Drive.")
+    return joblib.load(io.BytesIO(response.content))
 
-@app.route('/')
-def home():
-    return render_template('index.html')
-
-@app.route('/predict', methods=['POST'])
-def predict():
-    try:
-        features = [float(x) for x in request.form.values()]
-        prediction = model.predict([features])
-        result = "Intrusion Detected!" if prediction[0] == 1 else "Normal Traffic"
-        return render_template('index.html', prediction=result)
-    except Exception as e:
-        return f"Error: {e}"
-
-if __name__ == '__main__':
-    app.run(debug=True)
+# Load model from Google Drive
+share_link = "https://drive.google.com/file/d/1NzqLuyVud-gphTpecXncMK6oGuWRv9JJ/view?usp=sharing"
+model = download_model_from_gdrive(share_link)
