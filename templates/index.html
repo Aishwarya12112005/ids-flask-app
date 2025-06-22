@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Intrusion Detection System</title>
+</head>
+<body>
+    <h2>Enter Network Traffic Features:</h2>
+    <form method="POST" action="/predict">
+        <input type="text" name="f1" placeholder="Feature 1">
+        <input type="text" name="f2" placeholder="Feature 2">
+        <input type="text" name="f3" placeholder="Feature 3">
+        <input type="text" name="f4" placeholder="Feature 4">
+        <!-- Add more fields as required -->
+        <input type="submit" value="Predict">
+    </form>
+
+    {% if prediction %}
+        <h3>Prediction Result: {{ prediction }}</h3>
+    {% endif %}
+</body>
+</html>
