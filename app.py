@@ -1,10 +1,23 @@
-import gdown
-
-url = "https://drive.google.com/uc?id=1NzqLuyVud-gphTpecXncMK6oGuWRv9JJ"
-output_path = "ids_model.pkl"
-
-gdown.download(url, output_path, quiet=False)
-
-# Then your ML model is loaded
+from flask import Flask, request, render_template
 import joblib
-model = joblib.load(output_path)
+import numpy as np
+
+app = Flask(__name__)
+model = joblib.load("ids_model.pkl")
+
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    try:
+        features = [float(request.form[f'feature{i}']) for i in range(1, 5)]
+        prediction = model.predict([features])[0]
+        result = "Intrusion Detected" if prediction == 1 else "Normal Traffic"
+    except:
+        result = "Error in input. Please check all fields."
+    return render_template('index.html', prediction=result)
+
+if __name__ == '__main__':
+    app.run(debug=True)
